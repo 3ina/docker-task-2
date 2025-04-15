@@ -10,6 +10,8 @@ router = APIRouter()
 async def read_tasks():
     """Get all tasks"""
     tasks = await get_all_tasks()
+    for item in tasks:
+        item["_id"] = str(item["_id"])
     return tasks
 
 @router.get("/{task_id}", response_model=TaskResponse)
@@ -23,7 +25,7 @@ async def read_task(task_id: str):
     task = await get_task(task_id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
-    
+    task["_id"] = str(task["_id"])
     return task
 
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
@@ -53,6 +55,9 @@ async def update_existing_task(task_id: str, task_update: TaskUpdateModel):
     # Update the task
     updated_task = await update_task(task_id, task_update.dict(exclude_unset=True))
     
+    updated_task["_id"] = str(updated_task["_id"])
+
+
     return updated_task
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
