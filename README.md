@@ -106,69 +106,36 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 version: '3.8'
 
-  
-
 services:
+  backend:
+    build: ./backend
+    container_name: fastapi_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017/
+      - MONGODB_DB=taskdb
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
 
-backend:
-
-build: ./backend
-
-container_name: fastapi_backend
-
-ports:
-
-- "8000:8000"
-
-environment:
-
-- MONGODB_URL=mongodb://mongodb:27017/
-
-- MONGODB_DB=taskdb
-
-depends_on:
-
-- mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
 
 networks:
-
-- app-network
-
-  
-
-  
-
-mongodb:
-
-image: mongo:latest
-
-container_name: mongodb
-
-ports:
-
-- "27017:27017"
+  app-network:
+    driver: bridge
 
 volumes:
-
-- mongo-data:/data/db
-
-networks:
-
-- app-network
-
-  
-
-networks:
-
-app-network:
-
-driver: bridge
-
-  
-
-volumes:
-
-mongo-data:
+  mongo-data:
 
 ```
 
